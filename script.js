@@ -94,10 +94,14 @@ function initAnimations() {
         }
     });
 
-    // Pull layers apart on Z-axis and slightly on X/Y to show "exploded" internal workings
-    tlExplode.to(".ui-layer", { z: 250, x: -50, y: -50 }, 0)
+    // Scale down the explosion effect on mobile
+    const isMobile = window.innerWidth <= 768;
+    const explodeZ = isMobile ? 120 : 250;
+    const explodeXY = isMobile ? 20 : 50;
+
+    tlExplode.to(".ui-layer", { z: explodeZ, x: -explodeXY, y: -explodeXY }, 0)
              .to(".code-layer", { z: 0 }, 0)
-             .to(".logic-layer", { z: -250, x: 50, y: 50 }, 0);
+             .to(".logic-layer", { z: -explodeZ, x: explodeXY, y: explodeXY }, 0);
 
     // 4. About Me - Stats Counter and Engine Block Stagger
     const aboutTl = gsap.timeline({
@@ -115,7 +119,6 @@ function initAnimations() {
     // 5. Fleet Showcase (Horizontal Cinematic Scroll)
     const track = document.querySelector(".project-track");
     if(track) {
-        // Animate the opacity of the section header to ensure it's visible
         gsap.from("#work .section-header", {
             y: 50,
             opacity: 0,
@@ -136,12 +139,10 @@ function initAnimations() {
                 end: () => `+=${track.scrollWidth}`,
                 pin: true,
                 scrub: 1,
-                invalidateOnRefresh: true
+                invalidateOnRefresh: true,
+                anticipatePin: 1 // Smoother pinning on mobile
             }
         });
-        
-        // Remove the opacity:0 initial state on cards that might have gotten stuck.
-        // Instead, cards gently pop in as they scroll into the viewport horizontally.
     }
 
     // 6. Tools Marquee Entrance
